@@ -5,6 +5,7 @@ const port = process.env.PORT || 5000
 
 
 // component
+require('./DB/db')
 const inventoryRoutes = require('./routes/inventoryRoutes')
 
 
