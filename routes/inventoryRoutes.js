@@ -59,5 +59,17 @@ router.post('/addInventory', async (req, res) => {
 
 
 
+// delete inventory item
+router.delete('/deleteItem/:id', async (req, res) => {
+    const _inventoryItem = await Inventory.findOneAndDelete({_id: req.params.id})
+    if(!_inventoryItem) return res.json({message: 'Inventory Item not found'})
+
+    res.json({
+        message: 'Inventory Item deleted successfully.',
+        _inventoryItem
+    })
+})
+
+
 
 module.exports = router;
