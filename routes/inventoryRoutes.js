@@ -36,4 +36,28 @@ router.post('/increase/:id', async (req, res) => {
     res.json({inventoryItem})
 })
 
+
+// add inventory item
+router.post('/addInventory', async (req, res) => {
+    const {name,img,description,quantity,price,supplier} = req.body;
+    const _addInventoryItem = new Inventory({
+        name,
+        img,
+        description,
+        quantity,
+        price,
+        supplier
+    })
+
+    const _addedInventory = await _addInventoryItem.save()
+    if(!_addedInventory) return res.json({message: 'Inventory Item adding failed'})
+    res.json({
+        message: 'Inventory Item added successfully.',
+        _addedInventory
+    })
+})
+
+
+
+
 module.exports = router;
