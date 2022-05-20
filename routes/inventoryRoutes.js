@@ -9,6 +9,18 @@ router.get('/inventory', async (req, res) =>{
     res.json({inventory})
 })
 
+// get all inventory items
+router.get('/homeInventory', async (req, res) =>{
+    const inventory = await Inventory.find().limit(6)
+    res.json({inventory})
+})
+
+// get My items
+router.get('/myInventory', async (req, res) =>{
+    const inventory = await Inventory.find({email: req.query.email})
+    res.json({inventory})
+})
+
 // get single inventory item
 router.get('/inventory/item', async (req, res) =>{
     const inventoryItem = await Inventory.findOne({_id: req.query.id})
@@ -39,8 +51,9 @@ router.post('/increase/:id', async (req, res) => {
 
 // add inventory item
 router.post('/addInventory', async (req, res) => {
-    const {name,img,description,quantity,price,supplier} = req.body;
+    const {email,name,img,description,quantity,price,supplier} = req.body;
     const _addInventoryItem = new Inventory({
+        email,
         name,
         img,
         description,
@@ -56,7 +69,6 @@ router.post('/addInventory', async (req, res) => {
         _addedInventory
     })
 })
-
 
 
 // delete inventory item
