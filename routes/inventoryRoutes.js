@@ -1,10 +1,14 @@
 const express = require('express')
 const router = express.Router()
 const Inventory = require('../model/Inventory')
+const jwt = require('jsonwebtoken')
+const auth = require('../middleware/auth')
+
+
 
 
 // get all inventory items
-router.get('/inventory', async (req, res) =>{
+router.get('/inventory', auth, async (req, res) =>{
     const inventory = await Inventory.find()
     res.json({inventory})
 })
@@ -16,13 +20,13 @@ router.get('/homeInventory', async (req, res) =>{
 })
 
 // get My items
-router.get('/myInventory', async (req, res) =>{
+router.get('/myInventory',auth, async (req, res) =>{
     const inventory = await Inventory.find({email: req.query.email})
     res.json({inventory})
 })
 
 // get single inventory item
-router.get('/inventory/item', async (req, res) =>{
+router.get('/inventory/item',auth, async (req, res) =>{
     const inventoryItem = await Inventory.findOne({_id: req.query.id})
     if(!inventoryItem) return res.json({message: 'Inventory Item not found'})
     res.json({inventoryItem})
@@ -50,7 +54,7 @@ router.post('/increase/:id', async (req, res) => {
 
 
 // add inventory item
-router.post('/addInventory', async (req, res) => {
+router.post('/addInventory',auth, async (req, res) => {
     const {email,name,img,description,quantity,price,supplier} = req.body;
     const _addInventoryItem = new Inventory({
         email,
