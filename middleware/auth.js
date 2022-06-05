@@ -1,16 +1,58 @@
-const jwt = require('jsonwebtoken')
+// const dotenv = require("dotenv").config()
+// dotenv
+const jwt = require("jsonwebtoken")
+const User = require("../models/User.js")
+const secret_key = process.env.SECRET_KEY
 
-const auth = (req, res, next) =>{
-    // req token from header
-    const token = req.headers['x-access-token'];
+
+
+// authentication token
+const auth = (req, res, next) => {
+    // request token from header
+    const token = req.headers['x-access-token']
+    if (!token) return res.status(401).json({ message: 'Unauthorized User.', error })
+    
 
     // verify token
-    jwt.verify(token, process.env.SECRET_KEY,(error, decoded) => {
-            if (error) return res.status(400).json({ message: 'Unauthorized User', error })
-            
-            req.decoded = decoded
-            next()
+    jwt.verify(token, secret_key, async (error, decoded) => {
+        try {
+            if (error) return res.status(403).json({ message: 'Forbidden user.', error })
+
+            // if token has been verified
+            const _user = await User.findOne({ email: decoded.email })
+            if (!_user) return res.status(400).json({ message: 'User not found.' })
+
+            // if user has been found. 
+            req.user = _user
+            req.user = {
+                id: _user._id,
+                name: _user.name,
+                email: _user.email,
+                phone: _user.phone,
+                role: _user.role
+            }
+
+            // go for the next step
+            return next()
+
+        } catch (error) {
+            return res.status(500).json({
+                message: 'Database Error',
+                error
+            })
+        }
     })
 }
 
-module.exports = auth
+
+
+
+// user role management
+const checkRole = roles => (req, res, next) => {
+    return !roles.includes(req.user.role) ? res.status(401).json({ message: `Unauthorized user` }) : next()
+}
+
+module.exports = {
+    auth,
+    checkRole
+}
